@@ -8,7 +8,7 @@ from rasterio.crs import CRS
 from rasterio.coords import BoundingBox
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 
-from ..coords import get_utm_zone
+from aeronet.coords import get_utm_zone
 from .geoobject import GeoObject
 from ._utils import band_shape_guard, random_name
 

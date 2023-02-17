@@ -1,11 +1,10 @@
 import os
-from abc import ABC
 
 import numpy as np
 from .band import Band
 
 from .geoobject import GeoObject
-from ..coords import get_utm_zone
+from aeronet.coords import get_utm_zone
 
 
 class BandCollection(GeoObject):
