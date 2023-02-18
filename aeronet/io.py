@@ -8,6 +8,59 @@ from .raster import Band
 from .raster import BandCollection
 
 
+class SequentialSampler:
+
+    def __init__(self, band_collection, channels, sample_size, bound=0):
+        """ Iterate over BandCollection sequentially with specified shape (+ bounds)
+        Args:
+            band_collection: BandCollection instance
+            channels: list of str, required channels with required order
+            sample_size: (height, width), size of `pure` sample in pixels (bounds not included)
+            bound: int, bounds in pixels added to sample
+        Return:
+            Iterable object (yield SampleCollection instances)
+        """
+
+        self.band_collection = band_collection
+        self.sample_size = sample_size
+        self.bound = bound
+        self.channels = channels
+        self.blocks = self._compute_blocks()
+
+    def __len__(self):
+        return len(self.blocks)
+
+    def __getitem__(self, i):
+        block = self.blocks[i]
+        sample = (self.band_collection
+                  .ordered(*self.channels)
+                  .sample(block['y'], block['x'], block['height'], block['width']))
+        return sample, block
+
+    def _compute_blocks(self):
+
+        h, w = self.sample_size
+        blocks = []
+        height = h + 2 * self.bound
+        width = w + 2 * self.bound
+
+        for y in range(- self.bound, self.band_collection.height, h):
+            for x in range(- self.bound, self.band_collection.width, w):
+                rigth_x_bound = max(self.bound,
+                                    x + width - self.band_collection.width)
+                bottom_y_bound = max(self.bound,
+                                     y + height - self.band_collection.height)
+
+                blocks.append({'x': x,
+                               'y': y,
+                               'height': height,
+                               'width': width,
+                               'bounds':
+                                   [[self.bound, bottom_y_bound], [self.bound, rigth_x_bound]],
+                               })
+        return blocks
+
+
 class SampleWindowWriter:
 
     def __init__(self, fp, shape, transform, crs, nodata, dtype='uint8'):
@@ -167,11 +220,11 @@ class SampleCollectionWindowWriter:
         return BandCollection(bands)
 
 
-"""class Predictor:
+class Predictor:
 
     def __init__(self, input_channels, output_labels, processing_fn,
                  sample_size=(1024, 1024), bound=256, n_workers=1, verbose=True, **kwargs):
-
+        """
 
         Args:
             input_channels: list of str, names of bands/channels
@@ -183,7 +236,7 @@ class SampleCollectionWindowWriter:
 
         Returns:
             processed BandCollection
-
+        """
 
         self.input_channels = input_channels
         self.output_labels = output_labels
@@ -223,4 +276,4 @@ class SampleCollectionWindowWriter:
                 for sample, block, dst in data:
                     self._processing(sample, block, dst)
 
-        return dst.close()"""
+        return dst.close()

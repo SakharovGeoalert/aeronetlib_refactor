@@ -4,7 +4,7 @@ import numpy as np
 from .band import Band
 
 from .geoobject import GeoObject
-from aeronet.coords import get_utm_zone
+from ..coords import get_utm_zone
 
 
 class BandCollection(GeoObject):
