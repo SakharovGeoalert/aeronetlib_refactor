@@ -1,23 +1,21 @@
 import numpy as np
 
 
-def add_mask(image, mask, channel='r', intensity=100):
+def add_mask_single(image: np.ndarray,
+                    mask: np.ndarray,
+                    color: tuple = (255, 0, 0),
+                    intensity: float = 0.5):
 
-        r, g, b = image.transpose(2,0,1)
-        mask = mask.squeeze() * intensity
+    mask = mask.squeeze() / np.max(mask)
+    mask = np.stack((color[0]*mask, color[1]*mask, color[2]*mask), axis=-1)*intensity
+    image = np.clip(image.astype(np.uint16) + mask.astype(np.uint16), 0, 255).astype(np.uint8)
+    return image
 
-        if channel == 'r':
-            r = r.astype(np.uint16) + mask.astype(np.uint16)
-            r = np.clip(r, 0, 255).astype(np.uint8)
 
-        if channel == 'g':
-            g = g.astype(np.uint16) + mask.astype(np.uint16)
-            g = np.clip(g, 0, 255).astype(np.uint8)
-
-        if channel == 'b':
-            b = b.astype(np.uint16) + mask.astype(np.uint16)
-            b = np.clip(b, 0, 255).astype(np.uint8)
-
-        image = np.stack((r, g, b)).transpose(1,2,0)
-
-        return image
+def add_mask(image: np.ndarray,
+             mask: np.ndarray,
+             colormap: tuple = ((255, 0, 0), (0, 255, 0), (0, 0, 255)),
+             intensity: float = 0.5):
+    for ch in range(mask.shape[2]):
+        image = add_mask_single(image, mask[:, :, ch], colormap[ch], intensity)
+    return image

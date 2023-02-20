@@ -5,6 +5,7 @@ from .band import Band
 
 from .geoobject import GeoObject
 from ..coords import get_utm_zone
+from ..visualization import add_mask
 
 
 class BandCollection(GeoObject):
@@ -196,6 +197,20 @@ class BandCollection(GeoObject):
 
     def numpy(self):
         return self.sample(0, 0, self.height, self.width).numpy()
+
+    def show(self, y=0, x=0, height=None, width=None, undersampling=1,
+             channels=(0, 1, 2), labels=(3,), **kwargs):
+        height = self.height if height is None else height
+        width = self.width if width is None else width
+        img = list()
+        for ch in channels:
+            img.append(self._bands[ch].sample(y, x, height, width).numpy()[::undersampling, ::undersampling])
+        img = np.stack(img, axis=-1)
+        mask = list()
+        for ch in labels:
+            mask.append(self._bands[ch].sample(y, x, height, width).numpy()[::undersampling, ::undersampling])
+        mask = np.stack(mask, axis=-1)
+        return add_mask(img, mask)
 
 
 class BandCollectionSample(GeoObject):

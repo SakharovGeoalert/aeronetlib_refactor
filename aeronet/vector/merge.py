@@ -1,4 +1,4 @@
-from aeronet.vector.featurecollection import FeatureCollection
+from .featurecollection import FeatureCollection
 
 
 def merge_dedupe(fcs):

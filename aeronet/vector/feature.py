@@ -5,7 +5,7 @@ from shapely.geometry import Polygon
 from shapely.ops import orient
 
 from rasterio.warp import transform_geom
-from aeronet.coords import _utm_zone, CRS_LATLON
+from ..coords import _utm_zone, CRS_LATLON
 
 
 class Feature:

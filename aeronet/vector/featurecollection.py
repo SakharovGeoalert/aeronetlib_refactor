@@ -3,8 +3,8 @@ import rtree
 import warnings
 from rasterio.crs import CRS
 from rasterio.errors import CRSError
-from aeronet.coords import _utm_zone, CRS_LATLON
-from aeronet.vector.feature import Feature
+from ..coords import _utm_zone, CRS_LATLON
+from .feature import Feature
 
 
 class FeatureCollection:
