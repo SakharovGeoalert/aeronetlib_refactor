@@ -1,1 +1,2 @@
-from .feature import Feature, FeatureCollection
+from .feature import Feature
+from .featurecollection import FeatureCollection
